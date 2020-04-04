@@ -1,21 +1,57 @@
+info:
+  component: Simple Zuul Proxy Server
+spring:
+  application:
+    name: fpe-zuul
+  cloud:
+    config:
+      uri: http://localhost:8080
+
 server:
   port: 8282
+
+cloud:
+  config:
+    failFast: true
+    discovery:
+      end: true
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://127.0.0.1:8181/eureka/
+      defaultZone: http://localhost:9001/eureka/
   instance:
     metadataMap:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}:${random.value}}
+      instanceId: ${spring.application.name}:${random.value}}
+
 
 zuul:
+  ignoredServices: "*"
   routes:
-    services1:
-      path: /service1/**
-      serviceId: service1
+    service1:
+      # every requests will be taken into account
+      # no URL nor Eureka service is set because the filter will be in charge of the route
+      path: /service1/
+      serviceId: service1-service1
+      url: http://localhost:9191/
       stripPrefix: false
-    services2:
-      path: /service2/**
-      serviceId: service2
+    service2:
+      # every requests will be taken into account
+      # no URL nor Eureka service is set because the filter will be in charge of the route
+      path: /service2/
+      serviceId: service2-service2
+      url: http://localhost:9292/
       stripPrefix: false
+    google:
+      path: /google/**
+      serviceId: google
+      url: https://www.google.com/
+      stripPrefix: false
+
+logging:
+  level:
+    ROOT: INFO
+    org.springframework.web: INFO
+    info.tcb: DEBUG
+
+whiteListIps: "127.0.0.1,localhost"
